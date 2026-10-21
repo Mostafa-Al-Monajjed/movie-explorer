@@ -4,7 +4,71 @@
   --font-sans: var(--font-geist-sans);
 }
 
+@theme {
+  --animate-page-in: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-ken-burns: ken-burns 24s ease-in-out infinite alternate;
+  --animate-glow: glow 7s ease-in-out infinite;
+
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ken-burns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.1); }
+  }
+  @keyframes glow {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.05); }
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
 body {
   background: #0a0a0a;
   color: #ededed;
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid #facc15;
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  [role="button"] {
+    cursor: pointer;
+  }
+}
+
+/* Skeleton بلمعة متحركة */
+.skeleton {
+  background-color: #262626;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+}
+
+/* احترام إعداد "تقليل الحركة" بنظام المستخدم */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

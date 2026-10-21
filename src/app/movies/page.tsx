@@ -1,23 +1,33 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getGenres } from "../lib/tmdb/movies";
 import { GenreFilter } from "../../components/GenreFilter";
 import { MovieGridSkeleton } from "../../components/MovieGridSkeleton";
 import {
   MovieResults,
   type MoviesSearchParams,
-} from "../../components/MovieResults";
+} from "@/components/MovieResults";
 import { SearchBar } from "../../components/SearchBar";
 import { SortSelect } from "../../components/SortSelect";
+import { parsePage } from "../lib/pagination";
+import { getGenres } from "../lib/tmdb/movies";
 
-export const metadata: Metadata = { title: "Browse Movies" };
+type Props = { searchParams: Promise<MoviesSearchParams> };
 
-export default async function MoviesPage({
+export async function generateMetadata({
   searchParams,
-}: {
-  searchParams: Promise<MoviesSearchParams>;
-}) {
-  const params = await searchParams; // بـ Next 15+ هي Promise
+}: Props): Promise<Metadata> {
+  const { page, q } = await searchParams;
+  const pageNumber = parsePage(page);
+
+  return {
+    title:
+      pageNumber > 1 ? `Browse Movies (Page ${pageNumber})` : "Browse Movies",
+    robots: q?.trim() ? { index: false } : undefined,
+  };
+}
+
+export default async function MoviesPage({ searchParams }: Props) {
+  const params = await searchParams;
   const { genres } = await getGenres();
 
   return (
@@ -35,7 +45,7 @@ export default async function MoviesPage({
       </Suspense>
 
       <div className="mt-8">
-        {/* الـ key يخلي الـ Skeleton يظهر مع كل تغيير بالبحث أو الفلتر */}
+        {/* params فيها page، فالـ Skeleton يظهر مع كل تغيير صفحة */}
         <Suspense key={JSON.stringify(params)} fallback={<MovieGridSkeleton />}>
           <MovieResults params={params} />
         </Suspense>

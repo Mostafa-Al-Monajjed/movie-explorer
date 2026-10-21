@@ -10,16 +10,16 @@ export function MovieCard({ movie }: { movie: FavoriteMovie }) {
   const year = movie.release_date?.slice(0, 4);
 
   return (
-    <div className="group relative">
+    <div className="group relative transition-transform duration-300 ease-out hover:-translate-y-1.5">
       <Link href={`/movie/${movie.id}`} className="block">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-neutral-800">
+        <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-neutral-800 transition-shadow duration-300 group-hover:shadow-[0_12px_40px_-8px_rgba(250,204,21,0.35)]">
           {poster ? (
             <Image
               src={poster}
               alt={movie.title}
               fill
               sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-neutral-500">

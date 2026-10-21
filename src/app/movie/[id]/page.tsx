@@ -13,6 +13,7 @@ import { getMovieDetails } from "../../lib/tmdb/movies";
 import { pickTrailer } from "../../lib/tmdb/trailer";
 import { FavoriteButton } from "../../../components/FavoriteButton";
 import { toFavorite } from "../../../app/lib/favorites";
+import { FadeIn } from "../../../components/FadeIn";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -65,7 +66,7 @@ export default async function MovieDetailsPage({ params }: Props) {
   const cast = movie.credits.cast.slice(0, 12);
 
   return (
-    <article>
+    <article className="overflow-x-clip">
       <section className="relative isolate overflow-hidden">
         {backdrop && (
           <Image

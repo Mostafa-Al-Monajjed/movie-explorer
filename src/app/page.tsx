@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTrendingMovies } from "../app/lib/tmdb/movies";
 import { Hero } from "../components/Hero";
 import { MovieGrid } from "../components/MovieGrid";
+import { FadeIn } from "../components/FadeIn";
 
 export default async function HomePage() {
   const { results } = await getTrendingMovies("week");
@@ -23,7 +24,9 @@ export default async function HomePage() {
             Browse all →
           </Link>
         </div>
-        <MovieGrid movies={others} />
+        <FadeIn>
+          <MovieGrid movies={others} />
+        </FadeIn>
       </section>
     </>
   );
