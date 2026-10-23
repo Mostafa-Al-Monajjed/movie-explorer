@@ -22,11 +22,14 @@ export function Header() {
             aria-label="Main"
             className="flex items-center gap-4 text-sm text-neutral-300 sm:gap-6"
           >
-            <Link href="/" className="hover:text-white">
+            <Link href="/" className="hidden hover:text-white sm:inline">
               Home
             </Link>
             <Link href="/movies" className="hover:text-white">
               Movies
+            </Link>
+            <Link href="/tonight" className="hover:text-white">
+              Tonight 🎲
             </Link>
             <FavoritesLink />
           </nav>
