@@ -76,3 +76,37 @@ export const GenresResponseSchema = z.object({
 });
 
 export type Genre = z.infer<typeof GenreSchema>;
+
+export const WatchProviderSchema = z.object({
+  provider_id: z.number(),
+  provider_name: z.string(),
+  logo_path: z.string().nullable(),
+  display_priority: z.number().optional(),
+});
+
+export const RegionProvidersSchema = z.object({
+  link: z.string().optional(),
+  flatrate: z.array(WatchProviderSchema).optional(),
+  free: z.array(WatchProviderSchema).optional(),
+  ads: z.array(WatchProviderSchema).optional(),
+  rent: z.array(WatchProviderSchema).optional(),
+  buy: z.array(WatchProviderSchema).optional(),
+});
+
+export const WatchProvidersResponseSchema = z.object({
+  id: z.number(),
+  results: z.record(z.string(), RegionProvidersSchema), // مفتاح لكل دولة: US, GB, DE...
+});
+
+export const WatchRegionSchema = z.object({
+  iso_3166_1: z.string(),
+  english_name: z.string(),
+});
+
+export const WatchRegionsResponseSchema = z.object({
+  results: z.array(WatchRegionSchema),
+});
+
+export type WatchProvider = z.infer<typeof WatchProviderSchema>;
+export type RegionProviders = z.infer<typeof RegionProvidersSchema>;
+export type WatchRegion = z.infer<typeof WatchRegionSchema>;

@@ -2,18 +2,20 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cache } from "react";
-import { Calendar, Clock, Star } from "lucide-react";
+import { Suspense, cache } from "react";
+import { Calendar, Clock, Star, Tv } from "lucide-react";
 import { CastList } from "../../../components/CastList";
-import { TrailerPlayer } from "../../../components/TrailerPlayer";
-import { formatDate, formatRuntime } from "../../lib/format";
-import { TMDBError } from "../../lib/tmdb/client";
-import { tmdbImage } from "../../lib/tmdb/image";
-import { getMovieDetails } from "../../lib/tmdb/movies";
-import { pickTrailer } from "../../lib/tmdb/trailer";
-import { FavoriteButton } from "../../../components/FavoriteButton";
-import { toFavorite } from "../../../app/lib/favorites";
 import { FadeIn } from "../../../components/FadeIn";
+import { FavoriteButton } from "../../../components/FavoriteButton";
+import { TrailerPlayer } from "../../../components/TrailerPlayer";
+import { WhereToWatch } from "../../../components/WhereToWatch";
+import { WhereToWatchSkeleton } from "../../../components/WhereToWatchSkeleton";
+import { toFavorite } from "../../../app/lib/favorites";
+import { formatDate, formatRuntime } from "../../../app/lib/format";
+import { TMDBError } from "../../../app/lib/tmdb/client";
+import { tmdbImage } from "../../../app/lib/tmdb/image";
+import { getMovieDetails } from "../../../app/lib/tmdb/movies";
+import { pickTrailer } from "../../../app/lib/tmdb/trailer";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -54,7 +56,7 @@ export default async function MovieDetailsPage({ params }: Props) {
   const { id } = await params;
   const movie = await loadMovie(id);
 
-  const backdrop = tmdbImage(movie.backdrop_path, "w500");
+  const backdrop = tmdbImage(movie.backdrop_path, "w1280");
   const poster = tmdbImage(movie.poster_path, "w500");
   const trailer = pickTrailer(movie.videos.results);
   const director = movie.credits.crew.find(
@@ -66,6 +68,7 @@ export default async function MovieDetailsPage({ params }: Props) {
   const cast = movie.credits.cast.slice(0, 12);
 
   return (
+    // overflow-x-clip: إضاءة التريلر بتمتد برا حدود الصفحة، فهذا يمنع شريط التمرير الأفقي
     <article className="overflow-x-clip">
       <section className="relative isolate overflow-hidden">
         {backdrop && (
@@ -89,7 +92,7 @@ export default async function MovieDetailsPage({ params }: Props) {
           </Link>
 
           <div className="mt-6 flex flex-col gap-8 md:flex-row">
-            <div className="relative aspect-[2/3] w-48 shrink-0 self-center overflow-hidden rounded-xl bg-neutral-800 shadow-2xl md:w-72 md:self-start">
+            <div className="animate-fade-up relative aspect-[2/3] w-48 shrink-0 self-center overflow-hidden rounded-xl bg-neutral-800 shadow-2xl md:w-72 md:self-start">
               {poster ? (
                 <Image
                   src={poster}
@@ -100,13 +103,16 @@ export default async function MovieDetailsPage({ params }: Props) {
                   className="object-cover"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-sm text-neutral-500">
+                <div className="flex h-full items-center justify-center text-sm text-neutral-400">
                   No poster
                 </div>
               )}
             </div>
 
-            <div className="flex-1">
+            <div
+              className="animate-fade-up flex-1"
+              style={{ animationDelay: "150ms" }}
+            >
               <h1 className="text-3xl font-bold md:text-4xl">
                 {movie.title}
                 {year && (
@@ -155,7 +161,7 @@ export default async function MovieDetailsPage({ params }: Props) {
                     <li key={genre.id}>
                       <Link
                         href={`/movies?genre=${genre.id}`}
-                        className="rounded-full border border-neutral-700 px-3 py-1 text-sm text-neutral-200 hover:border-yellow-400 hover:text-yellow-400"
+                        className="rounded-full border border-neutral-700 px-3 py-1 text-sm text-neutral-200 transition-colors hover:border-yellow-400 hover:text-yellow-400"
                       >
                         {genre.name}
                       </Link>
@@ -175,8 +181,16 @@ export default async function MovieDetailsPage({ params }: Props) {
                   <strong className="text-white">{director.name}</strong>
                 </p>
               )}
-              <div className="mt-6">
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <FavoriteButton movie={toFavorite(movie)} variant="full" />
+                <a
+                  href="#where-to-watch"
+                  className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-yellow-300 hover:shadow-[0_8px_30px_rgba(250,204,21,0.35)] active:translate-y-0"
+                >
+                  <Tv aria-hidden="true" className="h-4 w-4" />
+                  Where to watch
+                </a>
               </div>
             </div>
           </div>
@@ -184,38 +198,47 @@ export default async function MovieDetailsPage({ params }: Props) {
       </section>
 
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16">
-        <section aria-labelledby="trailer-heading">
-          <h2 id="trailer-heading" className="mb-4 text-2xl font-bold">
-            Trailer
-          </h2>
-          {trailer ? (
-            <>
-              <TrailerPlayer
-                videoKey={trailer.key}
-                title={movie.title}
-                posterSrc={tmdbImage(movie.backdrop_path, "w780")}
-              />
-              <a
-                href={`https://www.youtube.com/watch?v=${trailer.key}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-block text-sm text-neutral-400 hover:text-white"
-              >
-                Watch on YouTube ↗
-              </a>
-            </>
-          ) : (
-            <p className="text-neutral-400">No trailer available yet.</p>
-          )}
-        </section>
+        {/* Suspense: الصفحة تظهر فورًا، وقسم المنصات يوصل لما تجهز بياناته */}
+        <Suspense fallback={<WhereToWatchSkeleton />}>
+          <WhereToWatch movieId={movie.id} />
+        </Suspense>
+
+        <FadeIn>
+          <section aria-labelledby="trailer-heading">
+            <h2 id="trailer-heading" className="mb-4 text-2xl font-bold">
+              Trailer
+            </h2>
+            {trailer ? (
+              <>
+                <TrailerPlayer
+                  videoKey={trailer.key}
+                  title={movie.title}
+                  posterSrc={tmdbImage(movie.backdrop_path, "w780")}
+                />
+                <a
+                  href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-sm text-neutral-400 hover:text-white"
+                >
+                  Watch on YouTube ↗
+                </a>
+              </>
+            ) : (
+              <p className="text-neutral-400">No trailer available yet.</p>
+            )}
+          </section>
+        </FadeIn>
 
         {cast.length > 0 && (
-          <section aria-labelledby="cast-heading">
-            <h2 id="cast-heading" className="mb-4 text-2xl font-bold">
-              Top Cast
-            </h2>
-            <CastList cast={cast} />
-          </section>
+          <FadeIn>
+            <section aria-labelledby="cast-heading">
+              <h2 id="cast-heading" className="mb-4 text-2xl font-bold">
+                Top Cast
+              </h2>
+              <CastList cast={cast} />
+            </section>
+          </FadeIn>
         )}
       </div>
     </article>

@@ -106,6 +106,12 @@ export function TonightResult({ movie, mood, sharePath }: TonightResultProps) {
             >
               {hasTrailer ? "Details & trailer" : "View details"}
             </Link>
+            <Link
+              href={`/movie/${movie.id}#where-to-watch`}
+              className="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-5 py-2.5 text-sm font-semibold text-neutral-200 transition-all duration-300 hover:-translate-y-0.5 hover:border-yellow-400 hover:text-yellow-400"
+            >
+              Where to watch
+            </Link>
             <FavoriteButton movie={toFavorite(movie)} variant="full" />
             <ShareButton
               path={sharePath}

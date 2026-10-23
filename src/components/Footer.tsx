@@ -14,6 +14,18 @@ export function Footer() {
         API but is not endorsed or certified by TMDB.
       </p>
       <p className="mt-1">
+        Streaming availability data provided by{" "}
+        <a
+          href="https://www.justwatch.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-white"
+        >
+          JustWatch
+        </a>
+        .
+      </p>
+      <p className="mt-1">
         Built by Mustafa Al-Munajjed with Next.js, TypeScript &amp; Tailwind CSS
         ·{" "}
         <a
