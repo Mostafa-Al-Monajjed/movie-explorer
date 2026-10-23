@@ -2,15 +2,23 @@
 
 import { Heart, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useHydrated } from "../hooks/useHydrated";
-import { useFavoritesStore } from "../store/favorites";
+import {
+  buildListPath,
+  MAX_NAME_LENGTH,
+  MAX_SHARED_MOVIES,
+} from "../app/lib/shared-list";
+import { useFavoritesStore } from "@/store/favorites";
 import { MovieGrid } from "./MovieGrid";
 import { MovieGridSkeleton } from "./MovieGridSkeleton";
+import { ShareButton } from "./ShareButton";
 
 export function FavoritesView() {
   const hydrated = useHydrated();
   const favorites = useFavoritesStore((s) => s.favorites);
   const clearFavorites = useFavoritesStore((s) => s.clearFavorites);
+  const [name, setName] = useState("");
 
   if (!hydrated) return <MovieGridSkeleton count={5} />;
 
@@ -39,8 +47,47 @@ export function FavoritesView() {
     }
   }
 
+  const shareIds = favorites
+    .slice(0, MAX_SHARED_MOVIES)
+    .map((movie) => movie.id);
+  const cleanName = name.trim();
+
   return (
     <>
+      <section
+        aria-labelledby="share-heading"
+        className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-5"
+      >
+        <h2 id="share-heading" className="font-semibold">
+          Share your list
+        </h2>
+        <p className="mt-1 text-sm text-neutral-400">
+          Anyone with the link can see your{" "}
+          {favorites.length > MAX_SHARED_MOVIES
+            ? `${MAX_SHARED_MOVIES} most recent favorites`
+            : "favorites"}
+          . No account needed: the link contains only movie IDs and your
+          optional name.
+        </p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={MAX_NAME_LENGTH}
+            placeholder="Your name (optional)"
+            aria-label="Your name (optional)"
+            className="w-full rounded-full border border-neutral-800 bg-neutral-950 px-4 py-2.5 text-sm outline-hidden transition-shadow focus:border-yellow-400 focus:shadow-[0_0_0_4px_rgba(250,204,21,0.12)] sm:max-w-xs"
+          />
+          <ShareButton
+            path={buildListPath(shareIds, name)}
+            title={cleanName ? `${cleanName}'s movie list` : "My movie list"}
+            text="Check out my movie list"
+            label="Share my list"
+          />
+        </div>
+      </section>
+
       <div className="mb-6 flex items-center justify-between">
         <p className="text-neutral-400">
           {favorites.length} {favorites.length === 1 ? "movie" : "movies"} saved
