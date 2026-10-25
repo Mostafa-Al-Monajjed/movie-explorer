@@ -14,7 +14,7 @@ import {
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 // الصق هنا رمز التحقق من Google Search Console (قيمة content فقط) بعد ما تحصل عليه بالخطوة 4
-const GOOGLE_VERIFICATION = "";
+const GOOGLE_VERIFICATION = "aRMIcsogWPWg92Dvz6eM8-SxpoXWsvrFofXadr0Vo4Y";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
