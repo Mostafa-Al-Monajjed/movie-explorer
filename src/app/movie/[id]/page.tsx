@@ -16,6 +16,8 @@ import { TMDBError } from "../../../app/lib/tmdb/client";
 import { tmdbImage } from "../../../app/lib/tmdb/image";
 import { getMovieDetails } from "../../../app/lib/tmdb/movies";
 import { pickTrailer } from "../../../app/lib/tmdb/trailer";
+import { JsonLd } from "../../../components/JsonLd";
+import { siteUrl } from "../../lib/site";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -42,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: movie.title,
+    alternates: { canonical: `/movie/${movie.id}` },
     description,
     openGraph: {
       title: movie.title,
@@ -70,6 +73,20 @@ export default async function MovieDetailsPage({ params }: Props) {
   return (
     // overflow-x-clip: إضاءة التريلر بتمتد برا حدود الصفحة، فهذا يمنع شريط التمرير الأفقي
     <article className="overflow-x-clip">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Movie",
+          name: movie.title,
+          description: movie.overview || undefined,
+          image: poster ?? undefined,
+          datePublished: movie.release_date || undefined,
+          director: director
+            ? { "@type": "Person", name: director.name }
+            : undefined,
+          url: `${siteUrl}/movie/${movie.id}`,
+        }}
+      />
       <section className="relative isolate overflow-hidden">
         {backdrop && (
           <Image

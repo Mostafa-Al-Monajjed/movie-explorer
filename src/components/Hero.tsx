@@ -29,12 +29,12 @@ export function Hero({ movie }: { movie: Movie }) {
         >
           Trending now
         </p>
-        <h1
+        <h2
           className="animate-fade-up mt-2 text-4xl font-bold md:text-5xl"
           style={delay(220)}
         >
           {movie.title}
-        </h1>
+        </h2>
         <p
           className="animate-fade-up mt-3 line-clamp-3 max-w-2xl text-neutral-300"
           style={delay(340)}

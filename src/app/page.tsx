@@ -1,8 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { getTrendingMovies } from "../app/lib/tmdb/movies";
 import { Hero } from "../components/Hero";
+import { JsonLd } from "../components/JsonLd";
 import { MovieGrid } from "../components/MovieGrid";
-import { FadeIn } from "../components/FadeIn";
+import {
+  siteAuthor,
+  siteDescription,
+  siteName,
+  siteUrl,
+} from "../app/lib/site";
+import { getTrendingMovies } from "../app/lib/tmdb/movies";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `${siteName}: Trending Movies, Trailers & Where to Watch`,
+  },
+  description: siteDescription,
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const { results } = await getTrendingMovies("week");
@@ -12,7 +27,22 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: siteName,
+          alternateName: `${siteName} by ${siteAuthor}`,
+          url: siteUrl,
+        }}
+      />
+
+      <h1 className="sr-only">
+        {siteName}: discover trending movies, trailers and where to watch
+      </h1>
+
       {featured && <Hero movie={featured} />}
+
       <section className="mx-auto max-w-6xl px-4 pt-10">
         <Link
           href="/tonight"
@@ -31,6 +61,7 @@ export default async function HomePage() {
           </span>
         </Link>
       </section>
+
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Trending This Week</h2>
@@ -41,9 +72,7 @@ export default async function HomePage() {
             Browse all →
           </Link>
         </div>
-        <FadeIn>
-          <MovieGrid movies={others} />
-        </FadeIn>
+        <MovieGrid movies={others} />
       </section>
     </>
   );

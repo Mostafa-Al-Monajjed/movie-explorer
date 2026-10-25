@@ -1,6 +1,13 @@
-// رابط الموقع: من Vercel تلقائيًا، أو من SITE_URL لو ربطت دومين خاص
-export const siteUrl =
+export const siteName = "Movie Explorer";
+export const siteAuthor = "Mustafa Al-Munajjed";
+export const siteDescription =
+  "Discover trending movies, watch trailers, see where to stream them, and pick a movie for tonight. Built with Next.js and TMDB.";
+
+// رابط الموقع: من Vercel تلقائيًا، أو من SITE_URL لو ربطت دومين خاص (بدون / بالنهاية)
+const rawUrl =
   process.env.SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000");
+
+export const siteUrl = rawUrl.replace(/\/+$/, "");
